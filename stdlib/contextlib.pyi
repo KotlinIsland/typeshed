@@ -1,4 +1,3 @@
-import abc
 import sys
 from _typeshed import FileDescriptorOrPath, Unused
 from abc import ABC, abstractmethod
@@ -178,9 +177,9 @@ class _BaseExitStack(Generic[_ExitT_co]):
     def callback(self, callback: Callable[_P, _T], /, *args: _P.args, **kwds: _P.kwargs) -> Callable[_P, _T]: ...
     def pop_all(self) -> Self: ...
 
-# In reality this is a subclass of `AbstractContextManager`;
-# see #7961 for why we don't do that in the stub
-class ExitStack(_BaseExitStack[_ExitT_co], metaclass=abc.ABCMeta):
+_TExitStack_co = TypeVar("_TExitStack_co", default=ExitStack)
+
+class ExitStack(_BaseExitStack[_ExitT_co], AbstractContextManager[_TExitStack_co]):
     def close(self) -> None: ...
     def __enter__(self) -> Self: ...
     def __exit__(
@@ -192,9 +191,7 @@ _ExitCoroFunc: TypeAlias = Callable[
 ]
 _ACM_EF = TypeVar("_ACM_EF", bound=AbstractAsyncContextManager[Any, Any] | _ExitCoroFunc)
 
-# In reality this is a subclass of `AbstractAsyncContextManager`;
-# see #7961 for why we don't do that in the stub
-class AsyncExitStack(_BaseExitStack[_ExitT_co], metaclass=abc.ABCMeta):
+class AsyncExitStack(_BaseExitStack[_ExitT_co], AbstractAsyncContextManager[Any]):
     async def enter_async_context(self, cm: AbstractAsyncContextManager[_T, _ExitT_co]) -> _T: ...
     def push_async_exit(self, exit: _ACM_EF) -> _ACM_EF: ...
     def push_async_callback(
